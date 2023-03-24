@@ -19,9 +19,9 @@ globalSpreadBuy = Spread de compra
 globalSpreadSell = Spread de venta
 Si el broken no tiene diferencia de Spread entre compras y ventas se configura el mismo spread en las dos variables
 
-globalTrailing = valor de la cantitad de Ticks despues de los cuales se va a establecer automaticamente el StopLost
+globalTrailing = Valor de la cantitad de Ticks despues de los cuales se va a establecer automaticamente el StopLost
 
-globalTrailingStop = valor de cantidad de Ticks se va a establecer el StopLost (la diferencia entre globalTrailing y globalTrailingStop es la cantidad de Ticks que se van a dejar de margen para que el mercado oscile antes de tocar el StopLost)
+globalTrailingStop = Valor de cantidad de Ticks se va a establecer el StopLost (la diferencia entre globalTrailing y globalTrailingStop es la cantidad de Ticks que se van a dejar de margen para que el mercado oscile antes de tocar el StopLost)
 
 globalSymbol = Nomeda en que se va a trabajar (Necesario para abrir o cerrar automaticamente las posiciones)
 
