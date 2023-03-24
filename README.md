@@ -5,3 +5,12 @@ Este código define una función llamada `getActivePosition` que toma un paráme
 La función luego obtiene una lista de posiciones abiertas utilizando la función `positions_get` de la biblioteca MetaTrader 5. Si hay posiciones abiertas, la función recupera la primera posición de la lista y realiza una serie de cálculos basados en el tipo de posición (compra o venta). Estos cálculos incluyen establecer stops de seguimiento, calcular ganancias y cerrar posiciones si se cumplen ciertas condiciones.
 
 Si no hay posiciones abiertas, la función establece todas las variables globales relacionadas con la información de posición en cero. El código también incluye una línea comentada que llama a una función llamada `printInfo(1)` que presumiblemente muestra información sobre el estado actual del algoritmo de trading.
+
+```bash
+globalSpreadBuy = 3
+globalSpreadSell = 3
+globalTrailing = 3
+globalTrailingStop = 2
+globalSymbol = "EURUSD"
+globalVolume = 0.10
+
