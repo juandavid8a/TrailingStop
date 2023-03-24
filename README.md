@@ -13,7 +13,7 @@ globalTrailing = 3
 globalTrailingStop = 2
 globalSymbol = "EURUSD"
 globalVolume = 0.10
-
+```
 globalSpreadBuy = Spread de compra
 globalSpreadSell = Spread de venta
 Si el broken no tiene diferencia de Spread entre compras y ventas se configura el mismo spread en las dos variables
