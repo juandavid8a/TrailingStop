@@ -39,14 +39,7 @@ int OnInit()
 //---
    return(INIT_SUCCEEDED);
   }
-//+------------------------------------------------------------------+
-//| Expert deinitialization function                                 |
-//+------------------------------------------------------------------+
-void OnDeinit(const int reason)
-  {
-//---
 
-  }
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
@@ -72,6 +65,7 @@ void OnTick()
          globalPrice = priceConvert(SymbolInfoDouble(globalPositionSymbol, SYMBOL_ASK));
          if(globalPositionInit)
            {
+            globalPositionStop = globalPositionOpen + globalStopLoss;
             globalPositionTrailing = globalPositionOpen - globalTrailing - globalSpread;
             globalPositionInit = false;
            }
@@ -82,19 +76,16 @@ void OnTick()
             globalPositionStop = globalPrice + globalTrailingStop;
            }
 
-         if(globalPositionStop > 0 && globalGross > 0)
+         if(globalPrice >= globalPositionStop)
            {
-            if(globalPrice >= globalPositionStop)
+            bool result = trade.PositionClose(globalTicket);
+            if(result)
               {
-               bool result = trade.PositionClose(globalTicket);
-               if(result)
-                 {
-                  resetInit();
-                 }
-               else
-                 {
-                  Print("No se pudo cerrar la posición");
-                 }
+               resetInit();
+              }
+            else
+              {
+               Print("No se pudo cerrar la posición de venta");
               }
            }
         }
@@ -104,6 +95,7 @@ void OnTick()
             globalPrice = priceConvert(SymbolInfoDouble(globalPositionSymbol, SYMBOL_BID));
             if(globalPositionInit)
               {
+               globalPositionStop = globalPositionOpen - globalStopLoss;
                globalPositionTrailing = globalPositionOpen + globalTrailing + globalSpread;
                globalPositionInit = false;
               }
@@ -114,23 +106,20 @@ void OnTick()
                globalPositionStop = globalPrice - globalTrailingStop;
               }
 
-            if(globalPositionStop > 0)
+            if(globalPrice <= globalPositionStop)
               {
-               if(globalPrice <= globalPositionStop && globalGross > 0)
+               bool result = trade.PositionClose(globalTicket);
+               if(result)
                  {
-                  bool result = trade.PositionClose(globalTicket);
-                  if(result)
-                    {
-                     resetInit();
-                    }
-                  else
-                    {
-                     Print("No se pudo cerrar la posición");
-                    }
+                  resetInit();
+                 }
+               else
+                 {
+                  Print("No se pudo cerrar la posición de compra");
                  }
               }
            }
-      Print("Ticket: ", globalTicket, " apertura: ", globalPositionOpen, " profit: ", globalGross, " precio: ", globalPrice, " TrailN: ", globalPositionTrailing, " Stop: ", globalPositionStop);
+      Print("Ticket: ", globalTicket, " Apertura: ", globalPositionOpen, " Profit: ", globalGross, " Precio: ", globalPrice, " Trail: ", globalPositionTrailing, " Stop: ", globalPositionStop);
      }
    else
      {
@@ -139,17 +128,7 @@ void OnTick()
   }
 
 //+------------------------------------------------------------------+
-//| Trade function                                                   |
-//+------------------------------------------------------------------+
-void OnTrade()
-  {
-//---
-
-  }
-//+------------------------------------------------------------------+
-
-//+------------------------------------------------------------------+
-//|                                                                  |
+//| PRICE CONVERT                                                    |
 //+------------------------------------------------------------------+
 long priceConvert(double price)
   {
@@ -166,7 +145,7 @@ long priceConvert(double price)
 //+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
-//|                                                                  |
+//| RESET INIT                                                       |
 //+------------------------------------------------------------------+
 void resetInit()
   {
@@ -185,7 +164,7 @@ void resetInit()
 //+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
-//|                                                                  |
+//| UPDATE STOPLOSS                                                  |
 //+------------------------------------------------------------------+
 void setStopLoss()
   {
