@@ -1,9 +1,9 @@
 //+------------------------------------------------------------------+
-//|                                                      vikingo.mq5 |
-//|                                  Copyright 2023, MetaQuotes Ltd. |
+//|                                                Administrator.mq5 |
+//|                                  Copyright 2024, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2023, MetaQuotes Ltd."
+#property copyright "Copyright 2024, MetaQuotes Ltd."
 #property link      "https://www.mql5.com"
 #property version   "1.00"
 
@@ -11,10 +11,10 @@
 CTrade trade;
 
 //--- input parameters
-input int globalTrailing;
-input int globalTrailingStop;
-input int globalStopLoss;
-input int globalSpread;
+input int globalTrailing=4;
+input int globalTrailingStop=2;
+input int globalStopLoss=30;
+input int globalSpread=3;
 
 bool     test = false;
 bool     globalPositionInit = true;
@@ -24,6 +24,7 @@ ulong    globalTicket;
 string   globalSymbol;
 string   globalPositionSymbol;
 long     globalPositionType;
+string   globalPositionTypeString;
 long     globalPositionOpen;
 long     globalPositionStop;
 double   globalGross;
@@ -36,6 +37,13 @@ int OnInit()
 //---
    globalSymbol = Symbol();
    globalTickValue = SymbolInfoDouble(Symbol(), SYMBOL_TRADE_TICK_VALUE);
+   
+   createText("Type", ".", 130);
+   createText("Stop", ".", 110);
+   createText("Open", ".", 90);
+   createText("Price", ".", 70);
+   createText("Trail", ".", 50);
+   createText("Gross", ".", 30);
 //---
    return(INIT_SUCCEEDED);
   }
@@ -59,7 +67,15 @@ void OnTick()
       globalPositionSymbol = PositionGetString(POSITION_SYMBOL);
       globalPositionOpen = priceConvert(PositionGetDouble(POSITION_PRICE_OPEN));
       globalPositionType = PositionGetInteger(POSITION_TYPE);
-
+      if(POSITION_TYPE == POSITION_TYPE_SELL){ globalPositionTypeString = "SELL"; }else{ globalPositionTypeString = "BUY"; }
+      
+      setText("Type", globalPositionTypeString);
+      setText("Stop", globalPositionStop);
+      setText("Open", globalPositionOpen);
+      setText("Price", globalPrice);
+      setText("Trail", globalPositionTrailing);
+      setText("Gross", globalGross);
+      
       if(globalPositionType == POSITION_TYPE_SELL)
         {
          globalPrice = priceConvert(SymbolInfoDouble(globalPositionSymbol, SYMBOL_ASK));
@@ -81,11 +97,12 @@ void OnTick()
             bool result = trade.PositionClose(globalTicket);
             if(result)
               {
-               resetInit();
+               InitializeGlobals();
               }
             else
               {
-               Print("No se pudo cerrar la posición de venta");
+               int error = GetLastError();
+               Print("Error al cerrar la posición de venta. Código de error:", error);
               }
            }
         }
@@ -111,11 +128,12 @@ void OnTick()
                bool result = trade.PositionClose(globalTicket);
                if(result)
                  {
-                  resetInit();
+                  InitializeGlobals();
                  }
                else
                  {
-                  Print("No se pudo cerrar la posición de compra");
+                  int error = GetLastError();
+                  Print("Error al cerrar la posición de compra. Código de error:", error);
                  }
               }
            }
@@ -123,7 +141,7 @@ void OnTick()
      }
    else
      {
-      resetInit();
+      InitializeGlobals();
      }
   }
 
@@ -147,7 +165,7 @@ long priceConvert(double price)
 //+------------------------------------------------------------------+
 //| RESET INIT                                                       |
 //+------------------------------------------------------------------+
-void resetInit()
+void InitializeGlobals()
   {
    globalPositionInit = true;
    globalPositionTrailing = 0;
@@ -156,6 +174,7 @@ void resetInit()
    globalSymbol = "";
    globalPositionSymbol = "";
    globalPositionType = 0;
+   globalPositionTypeString = "";
    globalPositionOpen = 0;
    globalPositionStop = 0;
    globalGross = 0;
@@ -172,5 +191,47 @@ void setStopLoss()
    double tickSize = SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_SIZE);
    double newStopLoss = priceOpen - globalStopLoss * tickSize;
    trade.OrderModify(globalTicket, 0, priceOpen, newStopLoss, 0, CLR_NONE);
+  }
+//+------------------------------------------------------------------+
+
+
+//+------------------------------------------------------------------+
+//| Create Text                                                       |
+//+------------------------------------------------------------------+
+void createText(string name, string value, int y)
+  {
+   string name1 = name+"_name";
+   string name2 = name+"_value"; 
+   int textLabel1 = ObjectCreate(0, name1, OBJ_LABEL, 0, 0, 0);
+   ObjectSetInteger(0, name1, OBJPROP_XDISTANCE, 160);
+   ObjectSetInteger(0, name1, OBJPROP_YDISTANCE, y);
+   ObjectSetInteger(0, name1, OBJPROP_CORNER, CORNER_RIGHT_LOWER);
+   ObjectSetInteger(0, name1, OBJPROP_XSIZE, 120);
+   ObjectSetInteger(0, name1, OBJPROP_YSIZE, 20);
+   ObjectSetInteger(0, name1, OBJPROP_COLOR, clrWhite);
+   ObjectSetInteger(0, name1, OBJPROP_STYLE, STYLE_DASH);
+   ObjectSetString(0, name1, OBJPROP_TEXT, name+": ");
+   
+   int textLabel2 = ObjectCreate(0, name2, OBJ_LABEL, 0, 0, 0);
+   ObjectSetInteger(0, name2, OBJPROP_XDISTANCE, 100);
+   ObjectSetInteger(0, name2, OBJPROP_YDISTANCE, y);
+   ObjectSetInteger(0, name2, OBJPROP_CORNER, CORNER_RIGHT_LOWER);
+   ObjectSetInteger(0, name2, OBJPROP_XSIZE, 120);
+   ObjectSetInteger(0, name2, OBJPROP_YSIZE, 20);
+   ObjectSetInteger(0, name2, OBJPROP_COLOR, clrWhite);
+   ObjectSetInteger(0, name2, OBJPROP_STYLE, STYLE_DASH);
+   ObjectSetString(0, name2, OBJPROP_TEXT, value);
+  }
+//+------------------------------------------------------------------+
+
+//+------------------------------------------------------------------+
+//| Set Text                                                       |
+//+------------------------------------------------------------------+
+void setText(string name, string value)
+  {
+   string name1 = name+"_name";
+   string name2 = name+"_value"; 
+   ObjectSetString(0, name1, OBJPROP_TEXT, name+":");
+   ObjectSetString(0, name2, OBJPROP_TEXT, value);
   }
 //+------------------------------------------------------------------+
