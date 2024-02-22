@@ -13,7 +13,7 @@ CTrade trade;
 //--- input parameters
 input int globalTrailing=4;
 input int globalTrailingStop=2;
-input int globalStopLoss=30;
+input int globalStopLoss=15;
 input int globalSpread=3;
 
 bool     test = false;
@@ -29,6 +29,9 @@ long     globalPositionOpen;
 long     globalPositionStop;
 double   globalGross;
 long     globalPrice;
+double   globalVolume;
+long     globalTicks;
+
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
@@ -39,12 +42,14 @@ int OnInit()
    globalSymbol = Symbol();
    globalTickValue = SymbolInfoDouble(Symbol(), SYMBOL_TRADE_TICK_VALUE);
    
-   createText("Type", "wait", 130);
-   createText("Stop", "wait", 110);
-   createText("Open", "wait", 90);
-   createText("Price", "wait", 70);
-   createText("Trail", "wait", 50);
-   createText("Gross", "wait", 30);
+   createText("Type", "wait", 170);
+   createText("Stop", "wait", 150);
+   createText("Open", "wait", 130);
+   createText("Price", "wait", 110);
+   createText("Trail", "wait", 90);
+   createText("Profit", "wait", 70);
+   createText("Volume", "wait", 50);
+   createText("Ticks", "wait", 30);
 //---
    return(INIT_SUCCEEDED);
   }
@@ -69,11 +74,13 @@ void OnTick()
       globalPositionOpen = priceConvert(PositionGetDouble(POSITION_PRICE_OPEN));
       globalPositionType = PositionGetInteger(POSITION_TYPE);
       if(globalPositionType == POSITION_TYPE_SELL){ globalPositionTypeString = "SELL"; }else{ globalPositionTypeString = "BUY"; }
+      globalVolume = PositionGetDouble(POSITION_VOLUME);
       
       groupSetText();
       
       if(globalPositionType == POSITION_TYPE_SELL)
         {
+         globalTicks = globalPositionOpen - globalPrice;
          globalPrice = priceConvert(SymbolInfoDouble(globalPositionSymbol, SYMBOL_ASK));
          if(globalPositionInit)
            {
@@ -105,7 +112,9 @@ void OnTick()
       else
          if(globalPositionType == POSITION_TYPE_BUY)
            {
+            globalTicks = globalPrice - globalPositionOpen;
             globalPrice = priceConvert(SymbolInfoDouble(globalPositionSymbol, SYMBOL_BID));
+            
             if(globalPositionInit)
               {
                globalPositionStop = globalPositionOpen - globalStopLoss;
@@ -175,6 +184,8 @@ void initializeGlobals()
    globalPositionStop = 0;
    globalGross = 0;
    globalPrice = 0;
+   globalVolume = 0;
+   globalTicks = 0;
    groupSetText();
   }
 //+------------------------------------------------------------------+
@@ -243,6 +254,8 @@ void groupSetText()
    setText("Open", IntegerToString(globalPositionOpen));
    setText("Price", IntegerToString(globalPrice));
    setText("Trail", IntegerToString(globalPositionTrailing));
-   setText("Gross", DoubleToString(globalGross));
+   setText("Profit", StringFormat("%.2f", globalGross));
+   setText("Volume", StringFormat("%.2f", globalVolume));
+   setText("Ticks", IntegerToString(globalTicks));
   }
 //+------------------------------------------------------------------+
