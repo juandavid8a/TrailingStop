@@ -35,15 +35,16 @@ long     globalPrice;
 int OnInit()
   {
 //---
+   initializeGlobals();
    globalSymbol = Symbol();
    globalTickValue = SymbolInfoDouble(Symbol(), SYMBOL_TRADE_TICK_VALUE);
    
-   createText("Type", ".", 130);
-   createText("Stop", ".", 110);
-   createText("Open", ".", 90);
-   createText("Price", ".", 70);
-   createText("Trail", ".", 50);
-   createText("Gross", ".", 30);
+   createText("Type", "wait", 130);
+   createText("Stop", "wait", 110);
+   createText("Open", "wait", 90);
+   createText("Price", "wait", 70);
+   createText("Trail", "wait", 50);
+   createText("Gross", "wait", 30);
 //---
    return(INIT_SUCCEEDED);
   }
@@ -67,14 +68,9 @@ void OnTick()
       globalPositionSymbol = PositionGetString(POSITION_SYMBOL);
       globalPositionOpen = priceConvert(PositionGetDouble(POSITION_PRICE_OPEN));
       globalPositionType = PositionGetInteger(POSITION_TYPE);
-      if(POSITION_TYPE == POSITION_TYPE_SELL){ globalPositionTypeString = "SELL"; }else{ globalPositionTypeString = "BUY"; }
+      if(globalPositionType == POSITION_TYPE_SELL){ globalPositionTypeString = "SELL"; }else{ globalPositionTypeString = "BUY"; }
       
-      setText("Type", globalPositionTypeString);
-      setText("Stop", globalPositionStop);
-      setText("Open", globalPositionOpen);
-      setText("Price", globalPrice);
-      setText("Trail", globalPositionTrailing);
-      setText("Gross", globalGross);
+      groupSetText();
       
       if(globalPositionType == POSITION_TYPE_SELL)
         {
@@ -97,7 +93,7 @@ void OnTick()
             bool result = trade.PositionClose(globalTicket);
             if(result)
               {
-               InitializeGlobals();
+               initializeGlobals();
               }
             else
               {
@@ -128,7 +124,7 @@ void OnTick()
                bool result = trade.PositionClose(globalTicket);
                if(result)
                  {
-                  InitializeGlobals();
+                  initializeGlobals();
                  }
                else
                  {
@@ -141,7 +137,7 @@ void OnTick()
      }
    else
      {
-      InitializeGlobals();
+      if(!globalPositionInit){initializeGlobals();}
      }
   }
 
@@ -165,7 +161,7 @@ long priceConvert(double price)
 //+------------------------------------------------------------------+
 //| RESET INIT                                                       |
 //+------------------------------------------------------------------+
-void InitializeGlobals()
+void initializeGlobals()
   {
    globalPositionInit = true;
    globalPositionTrailing = 0;
@@ -174,11 +170,12 @@ void InitializeGlobals()
    globalSymbol = "";
    globalPositionSymbol = "";
    globalPositionType = 0;
-   globalPositionTypeString = "";
+   globalPositionTypeString = "wait";
    globalPositionOpen = 0;
    globalPositionStop = 0;
    globalGross = 0;
    globalPrice = 0;
+   groupSetText();
   }
 //+------------------------------------------------------------------+
 
@@ -233,5 +230,19 @@ void setText(string name, string value)
    string name2 = name+"_value"; 
    ObjectSetString(0, name1, OBJPROP_TEXT, name+":");
    ObjectSetString(0, name2, OBJPROP_TEXT, value);
+  }
+//+------------------------------------------------------------------+
+
+//+------------------------------------------------------------------+
+//| Group Set Text                                                       |
+//+------------------------------------------------------------------+
+void groupSetText()
+  {
+   setText("Type", globalPositionTypeString);
+   setText("Stop", IntegerToString(globalPositionStop));
+   setText("Open", IntegerToString(globalPositionOpen));
+   setText("Price", IntegerToString(globalPrice));
+   setText("Trail", IntegerToString(globalPositionTrailing));
+   setText("Gross", DoubleToString(globalGross));
   }
 //+------------------------------------------------------------------+
