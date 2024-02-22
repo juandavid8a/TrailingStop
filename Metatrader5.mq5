@@ -42,14 +42,14 @@ int OnInit()
    globalSymbol = Symbol();
    globalTickValue = SymbolInfoDouble(Symbol(), SYMBOL_TRADE_TICK_VALUE);
    
-   createText("Type", "wait", 170);
-   createText("Stop", "wait", 150);
-   createText("Open", "wait", 130);
-   createText("Price", "wait", 110);
-   createText("Trail", "wait", 90);
-   createText("Profit", "wait", 70);
-   createText("Volume", "wait", 50);
-   createText("Ticks", "wait", 30);
+   createText("Type", "wait", 200);
+   createText("Stop", "wait", 180);
+   createText("Open", "wait", 160);
+   createText("Price", "wait", 140);
+   createText("Trail", "wait", 120);
+   createText("Profit", "wait", 100);
+   createText("Volume", "wait", 80);
+   createText("Ticks", "wait", 60);
 //---
    return(INIT_SUCCEEDED);
   }
@@ -211,17 +211,17 @@ void createText(string name, string value, int y)
    string name1 = name+"_name";
    string name2 = name+"_value"; 
    int textLabel1 = ObjectCreate(0, name1, OBJ_LABEL, 0, 0, 0);
-   ObjectSetInteger(0, name1, OBJPROP_XDISTANCE, 160);
+   ObjectSetInteger(0, name1, OBJPROP_XDISTANCE, 120);
    ObjectSetInteger(0, name1, OBJPROP_YDISTANCE, y);
    ObjectSetInteger(0, name1, OBJPROP_CORNER, CORNER_RIGHT_LOWER);
    ObjectSetInteger(0, name1, OBJPROP_XSIZE, 120);
    ObjectSetInteger(0, name1, OBJPROP_YSIZE, 20);
    ObjectSetInteger(0, name1, OBJPROP_COLOR, clrWhite);
-   ObjectSetInteger(0, name1, OBJPROP_STYLE, STYLE_DASH);
+   ObjectSetInteger(0, name1, OBJPROP_STYLE, STYLE_SOLID);
    ObjectSetString(0, name1, OBJPROP_TEXT, name+": ");
    
    int textLabel2 = ObjectCreate(0, name2, OBJ_LABEL, 0, 0, 0);
-   ObjectSetInteger(0, name2, OBJPROP_XDISTANCE, 100);
+   ObjectSetInteger(0, name2, OBJPROP_XDISTANCE, 50);
    ObjectSetInteger(0, name2, OBJPROP_YDISTANCE, y);
    ObjectSetInteger(0, name2, OBJPROP_CORNER, CORNER_RIGHT_LOWER);
    ObjectSetInteger(0, name2, OBJPROP_XSIZE, 120);
